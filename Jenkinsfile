@@ -5,7 +5,7 @@ pipeline {
         stage('checkout scm'){
             steps{
                 git branch: 'main',
-                    URL: 'https://github.com/jeevanbaddi/school-management-app'
+                    url: 'https://github.com/jeevanbaddi/school-management-app.git'
             }
         }
         stage('Install Dependencies'){
