@@ -1,0 +1,120 @@
+3️⃣ Real-Time Scenario: Code Changes + Pytest (DAILY DEVOPS WORKFLOW)
+
+Now your most important question 👇
+
+“If code already exists and I modify it, how do we run pytest properly?”
+
+✅ Standard Workflow (Used Daily in Companies)
+STEP 1: Pull latest code (if team)
+git pull
+
+STEP 2: Make code changes
+
+Example:
+
+vi app/main.py
+
+STEP 3: Update tests (IF behavior changed)
+
+🔑 MUST KNOW:
+
+Tests should change when behavior changes
+
+Example:
+
+New route added
+
+New validation added
+
+Expected output changed
+
+STEP 4: Update dependencies (if required)
+
+If you add a new library:
+
+pip install flask-login
+
+
+Then update:
+
+pip freeze > requirements.txt
+
+STEP 5: Install / Sync dependencies
+pip install -r requirements.txt
+
+
+🔑 This ensures:
+
+Your local environment matches repo state
+
+CI environment behaves same
+
+STEP 6: Run pytest
+python3 -m pytest -v
+
+
+If tests:
+
+❌ Fail → fix code or test
+
+✅ Pass → ready to commit
+
+STEP 7: Commit & push
+git add .
+git commit -m "Update login logic and tests"
+git push
+
+🔥 How Jenkins Will Do the Same Thing (IMPORTANT)
+
+In CI:
+
+git checkout
+pip install -r requirements.txt
+python3 -m pytest -v
+
+
+Exactly same steps.
+That’s why local = CI = prod.
+
+🧠 MUST-KNOW CONCEPT (VERY IMPORTANT)
+Why requirements.txt matters so much
+
+requirements.txt is the contract between:
+
+Developers
+
+Jenkins
+
+Docker
+
+Kubernetes
+
+If it’s wrong:
+
+CI breaks
+
+Docker builds fail
+
+Prod crashes
+
+⚠️ COMMON MISTAKES (AVOID THESE)
+
+❌ Running pytest without updating dependencies
+❌ Changing code but not tests
+❌ Installing libs locally but forgetting requirements.txt
+❌ Leaving containers running
+
+🎯 Real Interview Q & A
+❓ How do you ensure tests reflect code changes?
+
+Answer:
+
+“Whenever functionality changes, we update both code and corresponding pytest cases. Tests are always executed locally and in CI before merging.”
+
+✅ Summary (Lock This In)
+
+✔ Containers are disposable → stop & remove
+✔ Pytest imports code → no server needed
+✔ Tests must evolve with code
+✔ requirements.txt ensures consistency
+✔ Same flow locally & in CI

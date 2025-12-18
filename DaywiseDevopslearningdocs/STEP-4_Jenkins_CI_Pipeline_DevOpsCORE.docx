@@ -1,0 +1,283 @@
+🚀 STEP-4: Jenkins CI Pipeline (DevOps CORE)
+🔑 MUST KNOW (4+ Years DevOps Engineer)
+
+By the end of this step, you must clearly understand:
+
+Why Jenkins is needed
+
+What Jenkins actually does
+
+What a Jenkinsfile is
+
+How Jenkins runs pytest + Docker automatically
+
+How CI fits into the overall DevOps lifecycle
+
+1️⃣ Why Jenkins? (Not Just “Because DevOps”)
+Real-world problem
+
+Developers push code
+
+Someone forgets to test
+
+Someone forgets to build
+
+Broken code reaches production
+
+Jenkins solves this by:
+
+✔ Automating validation
+✔ Enforcing discipline
+✔ Acting as a gatekeeper
+
+No Jenkins = No production deployment (in real companies)
+
+2️⃣ Jenkins Role in YOUR Project
+
+Your CI flow will be:
+
+GitHub push
+   ↓
+Jenkins job triggered
+   ↓
+Install dependencies
+   ↓
+Run pytest
+   ↓
+Build Docker image
+
+
+⚠️ If pytest fails → pipeline stops
+⚠️ Docker image is built only if tests pass
+
+3️⃣ Jenkins Installation (Ubuntu)
+Step 3.1 – Update system
+sudo apt update
+
+Step 3.2 – Install Java (Jenkins needs Java)
+sudo apt install -y openjdk-17-jdk
+java -version
+
+
+🔑 MUST KNOW
+
+Jenkins is a Java application
+
+Java version mismatch = Jenkins issues
+
+Step 3.3 – Install Jenkins
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt update
+sudo apt install -y jenkins
+
+Step 3.4 – Start Jenkins
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+
+
+Check status:
+
+sudo systemctl status jenkins
+
+Step 3.5 – Access Jenkins UI
+
+Open browser:
+
+http://localhost:8080
+
+
+Get admin password:
+
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+🔑 MUST KNOW
+
+Jenkins runs as user jenkins
+
+Jenkins workspace is separate from your user home
+
+4️⃣ Jenkins Initial Setup (UI)
+
+Paste admin password
+
+Install Suggested Plugins
+
+Create admin user
+
+Finish setup
+
+5️⃣ Install Required Jenkins Plugins
+
+Go to:
+
+Manage Jenkins → Plugins → Available
+
+
+Install:
+
+✔ Git
+
+✔ Pipeline
+
+✔ Docker Pipeline
+
+Restart Jenkins if prompted.
+
+6️⃣ Jenkins Needs Docker Access (VERY IMPORTANT)
+
+By default, Jenkins cannot run docker commands.
+
+Fix it:
+
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins
+
+
+🔑 MUST KNOW
+
+Jenkins must talk to Docker daemon
+
+This is a very common real-world issue
+
+7️⃣ Jenkinsfile (CI Pipeline Definition)
+
+📄 Jenkinsfile (already in repo – update it)
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/<your-username>/school-management-app.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Pytest') {
+            steps {
+                sh 'python3 -m pytest -v'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t school-app:ci .'
+            }
+        }
+    }
+}
+
+🔑 MUST KNOW (Very Important)
+
+Jenkinsfile = CI logic as code
+
+Stored in GitHub
+
+Versioned
+
+Reviewed like application code
+
+8️⃣ Create Jenkins Pipeline Job
+
+Jenkins → New Item
+
+Name: school-app-ci
+
+Type: Pipeline
+
+Definition:
+
+Pipeline script from SCM
+
+SCM: Git
+
+Repo URL: GitHub repo
+
+Branch: main
+
+Script Path: Jenkinsfile
+
+Save
+
+9️⃣ Run the Pipeline
+
+Click Build Now
+
+Expected stages:
+
+Checkout ✔
+
+Install deps ✔
+
+Pytest ✔
+
+Docker build ✔
+
+🧠 Interview-Level Explanation
+
+Q: What does your CI pipeline do?
+
+Your Answer (4+ yrs):
+
+“Our Jenkins pipeline checks out code, installs dependencies, runs pytest for validation, and builds a Docker image only if tests pass.”
+
+🔥 This is a production-ready answer.
+
+🔁 VERY IMPORTANT: How YOU Should Practice This Again
+
+After we finish full deployment:
+
+You must:
+
+Create another repo
+
+Write a different Flask app
+
+Rebuild:
+
+Jenkins
+
+Docker
+
+Pytest
+
+Pipeline
+
+My role in second project:
+
+❌ I will NOT give full code
+
+✅ I will review
+
+✅ I will debug errors with you
+
+✅ I will ask why questions (like interviews)
+
+That’s how confidence comes.
+
+⚠️ COMMON MISTAKES (Watch These)
+
+❌ Jenkins can’t run docker → forgot docker group
+❌ Pytest fails in Jenkins → missing dependency
+❌ Hardcoding secrets in Jenkinsfile
+❌ Running Jenkins as root
+
+✅ What to Do NOW
+
+1️⃣ Install Jenkins
+2️⃣ Configure Docker access
+3️⃣ Create pipeline job
+4️⃣ Run build

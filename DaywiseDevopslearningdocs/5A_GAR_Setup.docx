@@ -1,0 +1,161 @@
+🚀 STEP-5A: GCP Artifact Registry Setup (Manual – First)
+
+🔑 DevOps principle (4+ yrs):
+Never automate infrastructure you haven’t created manually at least once.
+
+🎯 Goal of Step-5A
+
+By the end of this step:
+
+✅ Artifact Registry (Docker repo) exists in GCP
+
+✅ Jenkins can push Docker images to GCP
+
+✅ You clearly understand why & how this works
+
+1️⃣ What is Artifact Registry? (MUST KNOW)
+
+Definition (Interview-ready):
+
+Artifact Registry is a managed GCP service used to store, version, and manage container images and other build artifacts securely.
+
+Why we need it:
+
+Jenkins builds Docker image
+
+GKE cannot pull images from Jenkins local machine
+
+GKE can pull from Artifact Registry
+
+2️⃣ Verify GCP Project & Auth (VERY IMPORTANT)
+
+Run in Ubuntu:
+
+gcloud auth list
+
+
+You should see your email marked as ACTIVE.
+
+gcloud config list project
+
+
+If project is not set:
+
+gcloud config set project <YOUR_PROJECT_ID>
+
+
+🔑 MUST KNOW
+
+Terraform & Jenkins both rely on this context
+
+Wrong project = silent failures later
+
+3️⃣ Enable Artifact Registry API
+gcloud services enable artifactregistry.googleapis.com
+
+
+Why?
+
+GCP services are disabled by default
+
+Terraform will fail if API isn’t enabled
+
+4️⃣ Create Artifact Registry Repository (Docker)
+Command:
+gcloud artifacts repositories create school-app-repo \
+  --repository-format=docker \
+  --location=us-central1 \
+  --description="Docker images for school management app"
+
+Verify:
+gcloud artifacts repositories list
+
+
+Expected:
+
+school-app-repo   DOCKER   us-central1
+
+🔑 MUST KNOW (Region Choice)
+
+us-central1 → cheapest & common
+
+Same region as GKE = faster pulls
+
+5️⃣ Configure Docker to Authenticate with GCP
+
+This is CRITICAL.
+
+gcloud auth configure-docker us-central1-docker.pkg.dev
+
+
+This updates:
+
+~/.docker/config.json
+
+
+🔑 MUST KNOW
+
+Docker itself doesn’t know GCP
+
+This step links Docker ↔ GCP credentials
+
+6️⃣ Artifact Registry Image Naming Convention (IMPORTANT)
+
+Format:
+
+REGION-docker.pkg.dev/PROJECT_ID/REPO_NAME/IMAGE_NAME:TAG
+
+
+Example:
+
+us-central1-docker.pkg.dev/my-project/school-app-repo/school-app:1.0
+
+
+You must remember this format — interviewers love to ask this.
+
+7️⃣ Test Push Manually (Before Jenkins – BEST PRACTICE)
+Build image:
+docker build -t school-app:1.0 .
+
+Tag image:
+docker tag school-app:1.0 \
+us-central1-docker.pkg.dev/<PROJECT_ID>/school-app-repo/school-app:1.0
+
+Push image:
+docker push \
+us-central1-docker.pkg.dev/<PROJECT_ID>/school-app-repo/school-app:1.0
+
+8️⃣ Verify Image in GCP Console
+
+GCP Console →
+Artifact Registry → school-app-repo → Images
+
+You should see:
+
+school-app:1.0
+
+
+🎉 This confirms:
+
+Registry works
+
+Auth works
+
+Image naming is correct
+
+🧠 Interview-Ready Explanation
+
+Q: How do you make Docker images available to GKE?
+
+Your Answer:
+
+“We push Docker images to GCP Artifact Registry. Jenkins builds and pushes the image, and GKE pulls it securely using IAM permissions.”
+
+🔥 Strong answer.
+
+✅ STEP-5A COMPLETE CHECKLIST
+
+✔ Artifact Registry created
+✔ Docker authenticated with GCP
+✔ Image pushed successfully
+✔ Ready for Jenkins integration

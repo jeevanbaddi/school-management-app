@@ -1,0 +1,130 @@
+Git Commands Used So Far (REAL-TIME, NO EXTRA)
+
+Below are only the commands actually used in Step-1, with why they are used in real projects.
+
+1️⃣ git init
+git init
+
+What it does
+
+Converts a normal folder into a Git repository
+
+Creates the hidden .git/ directory
+
+Real-time usage
+
+Used once per project
+
+Always the first Git command in a new local project
+
+2️⃣ git status
+git status
+
+What it does
+
+Shows:
+
+Untracked files
+
+Staged files
+
+Branch name
+
+Real-time usage
+
+Used before every commit
+
+Helps avoid committing wrong files
+
+3️⃣ git add .
+git add .
+
+What it does
+
+Stages all new and modified files
+
+Real-time usage
+
+Used when committing multiple files
+
+Faster than adding files one by one
+
+⚠️ In real projects, sometimes:
+
+git add app/main.py
+
+
+(to stage specific files)
+
+4️⃣ git commit -m
+git commit -m "Initial project structure for school management app"
+
+What it does
+
+Saves a snapshot of staged files
+
+Creates a commit with a message
+
+Real-time usage
+
+Every logical change = one commit
+
+Commit message explains what & why
+
+5️⃣ git branch -M main
+git branch -M main
+
+What it does
+
+Renames current branch to main
+
+Real-time usage
+
+Standardizes branch name
+
+Required because GitHub default branch is main
+
+6️⃣ git remote add origin
+git remote add origin https://github.com/<your-username>/school-management-app.git
+
+What it does
+
+Connects local repo to remote GitHub repo
+
+Real-time usage
+
+Used once per repository
+
+Without this, git push will fail
+
+7️⃣ git push -u origin main
+git push -u origin main
+
+What it does
+
+Pushes local commits to GitHub
+
+-u sets upstream tracking
+
+Real-time usage
+
+First push always uses -u
+
+After this, simple git push is enough
+
+🧠 Interview-Ready Summary (Very Important)
+
+Q: How do you start a new project with Git?
+
+Your Answer:
+
+“I initialize the repository using git init, check file status, stage files using git add, commit with meaningful messages, set the main branch, link the remote GitHub repository, and push the initial structure.”
+
+🔥 This is a perfect professional answer.
+
+📌 Commands You Did NOT Use (Correctly)
+Command	Why not used now
+git clone	Repo already created locally
+git pull	No remote changes yet
+git checkout -b	Single main branch for now
+git merge	No branches yet
