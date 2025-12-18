@@ -1,0 +1,194 @@
+We will:
+
+Add Flask app code
+
+Add basic Admin & Faculty routes
+
+Add pytest tests
+
+Run pytest locally
+
+Commit & push to GitHub
+
+This ensures:
+👉 Jenkins can later fail/pass builds correctly
+
+1️⃣ Update requirements.txt
+
+📄 requirements.txt
+
+flask==3.0.0
+pytest==8.0.0
+pytest-flask==1.3.0
+
+
+Why:
+
+flask → web app
+
+pytest → testing
+
+pytest-flask → Flask testing support
+
+2️⃣ Flask Application Code
+📄 app/main.py
+from flask import Flask
+
+def create_app():
+    app = Flask(__name__)
+    app.config["SECRET_KEY"] = "school-secret-key"
+
+    @app.route("/")
+    def health():
+        return {"status": "ok"}, 200
+
+    @app.route("/login")
+    def login():
+        return "Login Page (Admin / Faculty)", 200
+
+    @app.route("/admin")
+    def admin_dashboard():
+        return "Admin Dashboard", 200
+
+    @app.route("/faculty")
+    def faculty_dashboard():
+        return "Faculty Dashboard", 200
+
+    return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run(host="0.0.0.0", port=5000)
+
+
+📌 Why this design?
+
+create_app() → best practice
+
+Makes testing easy
+
+Used in real production Flask apps
+
+📄 app/models.py
+# Models will be added later (DB integration)
+# Keeping this file for clean structure
+
+class User:
+    def __init__(self, username, role):
+        self.username = username
+        self.role = role
+
+
+📌 Why now?
+
+Shows future readiness
+
+Interviewers like clean separation
+
+📄 app/routes.py
+# Routes will be separated later
+# Currently defined in main.py for simplicity
+
+
+📌 We’ll refactor later when app grows
+
+3️⃣ HTML Templates (Simple Placeholders)
+📄 app/templates/login.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>School Login</h2>
+    <p>Admin / Faculty Login Page</p>
+</body>
+</html>
+
+📄 app/templates/admin_dashboard.html
+<h2>Admin Dashboard</h2>
+
+📄 app/templates/faculty_dashboard.html
+<h2>Faculty Dashboard</h2>
+
+4️⃣ Pytest Code (IMPORTANT)
+📄 tests/test_app.py
+from app.main import create_app
+
+def test_health_endpoint():
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json["status"] == "ok"
+
+
+📌 This proves:
+
+App starts correctly
+
+Health check works
+
+📄 tests/test_routes.py
+from app.main import create_app
+
+def test_login_page():
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/login")
+    assert response.status_code == 200
+
+def test_admin_dashboard():
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/admin")
+    assert response.status_code == 200
+
+
+📌 These are real CI tests, not dummy ones.
+
+5️⃣ Run Application Locally
+pip install -r requirements.txt
+python app/main.py
+
+
+Open browser:
+
+http://localhost:5000
+
+
+Expected:
+
+{"status":"ok"}
+
+6️⃣ Run Pytest Locally (MANDATORY)
+pytest -v
+
+
+Expected output:
+
+================== test session starts ==================
+3 passed in 0.20s
+
+
+✅ This means CI will pass later
+
+7️⃣ Git Commands for Step-2
+git status
+git add .
+git commit -m "Add Flask app with basic routes and pytest"
+git push
+
+🧠 Interview-Ready Explanation (VERY IMPORTANT)
+
+Q: How do you integrate testing in your application?
+
+Your answer:
+
+“We use pytest with Flask’s test client. Jenkins runs pytest before building Docker images. If any test fails, the pipeline stops, ensuring only tested code is deployed.”
+
+🔥 This is senior-level thinking.

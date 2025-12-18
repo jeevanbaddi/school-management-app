@@ -1,0 +1,152 @@
+🚀 STEP-3: Dockerize the Flask Application
+🔑 MUST KNOW (4+ Years DevOps Engineer)
+
+What a Dockerfile is
+
+How an image is built
+
+Difference between image & container
+
+How CI tools (Jenkins) use Docker
+
+How containers run the same way in local, Jenkins, and GKE
+
+1️⃣ Why Docker is Required (DevOps Perspective)
+Problem without Docker:
+
+“It works on my machine” issue
+
+Different Python versions
+
+Missing dependencies in prod
+
+Docker solves:
+
+✔ Same runtime everywhere
+✔ Immutable artifacts
+✔ Easy CI/CD integration
+
+👉 Docker image becomes the deployable unit.
+
+2️⃣ Dockerfile (This is Production-Style, Simple)
+
+📄 Dockerfile
+
+# Base image
+FROM python:3.10-slim
+
+# Set working directory inside container
+WORKDIR /app
+
+# Copy dependency file first (layer caching)
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Expose Flask port
+EXPOSE 5000
+
+# Start application
+CMD ["python", "app/main.py"]
+
+🔑 MUST KNOW (Interview)
+
+FROM → Base OS + runtime
+
+WORKDIR → Default directory inside container
+
+COPY requirements.txt . → Layer caching optimization
+
+RUN → Executes during image build
+
+CMD → Executes when container starts
+
+EXPOSE → Documentation + container networking
+
+⚠️ COMMON MISTAKE
+
+❌ Copy code first, then install dependencies
+✔ Always copy requirements.txt first for cache reuse
+
+3️⃣ Build Docker Image (Local)
+docker build -t school-app:1.0 .
+
+🔑 MUST KNOW
+
+-t → Tag image
+
+. → Docker build context
+
+Image is immutable
+
+Verify:
+
+docker images
+
+4️⃣ Run Container Locally
+docker run -d -p 5000:5000 --name school-app school-app:1.0
+
+
+Open browser:
+
+http://localhost:5000
+
+
+Expected:
+
+{"status":"ok"}
+
+🔑 MUST KNOW
+
+-p 5000:5000 → host:container port mapping
+
+Container runs isolated
+
+Same image will run in GKE later
+
+5️⃣ Test Inside Container (IMPORTANT)
+docker exec -it school-app python3 -m pytest -v
+
+MUST KNOW (VERY IMPORTANT)
+
+Confirms container has:
+
+Code
+
+Dependencies
+
+Tests
+
+Jenkins will do the same thing
+
+6️⃣ Stop & Clean Up
+docker stop school-app
+docker rm school-app
+
+7️⃣ Git Commit (Docker Step)
+git status
+git add Dockerfile
+git commit -m "Dockerize Flask app"
+git push
+
+🧠 Interview-Ready Explanation
+
+Q: How do you containerize applications?
+
+Your Answer (4+ yrs level):
+
+“We create a Dockerfile using a minimal base image, install dependencies, copy application code, expose required ports, and define an entrypoint. The same image is used across local, CI, and Kubernetes to ensure consistency.”
+
+🔥 This is exact production language.
+
+📌 GOOD TO KNOW
+
+Multi-stage builds (later)
+
+Non-root users (later)
+
+Image scanning (later)

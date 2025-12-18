@@ -1,0 +1,142 @@
+🔹 STEP 1: Open Terminal & Go to Project Directory
+cd ~
+ls
+
+
+Find your project folder:
+
+cd school-management-app
+
+🔑 MUST KNOW
+
+Git works per directory.
+You must be inside the repo folder.
+
+🔹 STEP 2: Verify It Is a Git Repository
+git status
+
+Expected output:
+On branch main
+Your branch is up to date with 'origin/main'.
+
+
+or
+
+Changes not staged for commit:
+
+🔑 MUST KNOW
+
+If this works → .git folder exists → repo is intact
+
+Git state is preserved even after reboot
+
+🔹 STEP 3: Check Which Branch You Are On
+git branch
+
+
+Expected:
+
+* main
+
+🔑 MUST KNOW
+
+Always confirm branch before committing
+
+Prevents accidental commits to wrong branch
+
+🔹 STEP 4: Check Remote Connection (VERY IMPORTANT)
+git remote -v
+
+
+Expected:
+
+origin  https://github.com/<your-username>/school-management-app.git (fetch)
+origin  https://github.com/<your-username>/school-management-app.git (push)
+
+🔑 MUST KNOW
+
+Confirms where your code will be pushed
+
+If missing → pushes will fail
+
+🔹 STEP 5: Check What Has Changed
+git status
+
+
+You should see:
+
+Modified files (Dockerfile, app files, etc.)
+
+Or “nothing to commit”
+
+🔑 MUST KNOW
+
+This is the most-used Git command in real life.
+
+🔹 STEP 6: Stage Changes
+
+If everything is correct:
+
+git add .
+
+🔑 MUST KNOW
+
+Stages all modified files
+
+Use cautiously in large repos
+
+🔹 STEP 7: Commit Changes
+git commit -m "Add Dockerfile and Dockerized Flask app"
+
+🔑 MUST KNOW
+
+Commit message explains what changed
+
+Use present tense
+
+🔹 STEP 8: Push to Same Branch (main)
+git push
+
+
+Because you already ran:
+
+git push -u origin main
+
+
+earlier, you don’t need -u again.
+
+🔐 STEP 9: Authentication (If Prompted)
+
+If GitHub asks for login:
+
+Use GitHub Personal Access Token
+
+NOT password
+
+🔑 MUST KNOW
+
+GitHub no longer supports password auth.
+
+🔹 STEP 10: Verify on GitHub UI
+
+Open GitHub repo
+
+Refresh page
+
+Confirm:
+
+Dockerfile exists
+
+Code updated
+
+Commit message visible
+
+🧠 Interview-Ready Explanation
+
+Q: What happens to Git state after system reboot?
+
+Your Answer:
+
+“Git metadata is stored inside the project directory in the .git folder, so restarting the system doesn’t affect repository state. We just navigate back to the repo and continue work.”
+
+🔥 That’s a 4+ years DevOps answer.

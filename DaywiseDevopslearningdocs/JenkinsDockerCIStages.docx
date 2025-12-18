@@ -1,0 +1,278 @@
+📘 DEVOPS PROJECT REFERENCE DOCUMENT
+
+(Till Jenkins + Docker + CI stage)
+
+0️⃣ OVERALL FLOW (MOST IMPORTANT – READ FIRST)
+🔑 END-TO-END FLOW WE BUILT
+Linux (Local System)
+   ↓
+Git & GitHub (Source Control)
+   ↓
+Jenkins (CI Tool)
+   ↓
+Pytest (Quality Gate)
+   ↓
+Docker (Image Build)
+   ↓
+Artifact Registry (Next Step)
+   ↓
+GKE (Next Step)
+
+
+👉 Interview Tip:
+Always explain tools as a flow, not individually.
+
+1️⃣ LINUX COMMANDS (FOUNDATION)
+🔑 WHY LINUX IS IMPORTANT (INTERVIEW)
+
+DevOps engineers work mostly on Linux servers, CI agents, and cloud VMs.
+
+📌 BASIC NAVIGATION (MOST USED)
+cd <directory>      # Move between directories
+ls                  # List files
+pwd                 # Show current directory
+
+
+🔑 Most Important: cd, ls, pwd
+
+📌 FILE & DIRECTORY MANAGEMENT
+mkdir folder_name           # Create directory
+touch file.txt              # Create empty file
+rm file.txt                 # Delete file
+rm -r folder_name           # Delete folder recursively
+
+📌 VIEW & VERIFY FILES
+cat file.txt                # View file content
+vi file.txt                 # Edit file
+tree                        # View directory structure
+
+
+🔑 Interview favorite: vi, tree
+
+📌 SYSTEM & SERVICES
+sudo systemctl status jenkins
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+
+
+🔑 Used to manage Jenkins & Docker services
+
+📌 USER & PERMISSIONS (VERY IMPORTANT)
+id jenkins
+sudo usermod -aG docker jenkins
+
+
+🔑 Most Important Linux concept we used
+
+Jenkins must be part of docker group to run Docker commands.
+
+📌 ENVIRONMENT & AUTH
+echo $PATH
+
+
+Used to understand why pytest command was not found.
+
+2️⃣ GIT & GITHUB (SOURCE CONTROL)
+🔑 WHY GIT IS IMPORTANT
+
+Git tracks changes; GitHub hosts code; Jenkins pulls from GitHub.
+
+📌 REPO INITIALIZATION
+git init
+
+
+Converts folder → Git repository.
+
+📌 CHECK STATUS (MOST USED COMMAND)
+git status
+
+
+🔑 Used before every commit
+
+📌 STAGING & COMMIT
+git add .
+git commit -m "Meaningful message"
+
+
+🔑 Interview Tip:
+
+Commit message should explain what & why.
+
+📌 BRANCH MANAGEMENT
+git branch
+git branch -M main
+
+
+Used to standardize branch name.
+
+📌 CONNECT TO GITHUB
+git remote add origin <repo-url>
+git remote -v
+
+📌 PUSH CODE
+git push -u origin main
+git push
+
+
+🔑 -u used only first time
+
+📌 AFTER SYSTEM RESTART (IMPORTANT SCENARIO)
+cd school-management-app
+git status
+git branch
+git push
+
+
+🔑 Interview Question
+
+Git state is preserved in .git folder.
+
+3️⃣ JENKINS (CI – CONTINUOUS INTEGRATION)
+🔑 WHAT JENKINS DOES (INTERVIEW DEFINITION)
+
+Jenkins automates build, test, and validation of code whenever changes are pushed.
+
+📌 JENKINS SERVICE CHECK
+sudo systemctl status jenkins
+
+📌 JENKINS USER CHECK
+id jenkins
+
+📌 DOCKER ACCESS VALIDATION (VERY IMPORTANT)
+sudo -u jenkins docker ps
+
+
+🔑 Top Interview Question
+
+Permission denied → Jenkins not in docker group.
+
+📌 JENKINSFILE (PIPELINE AS CODE)
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/jeevanbaddi/school-management-app.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Pytest') {
+            steps {
+                sh 'python3 -m pytest -v'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t school-app:ci .'
+            }
+        }
+    }
+}
+
+🔑 MOST IMPORTANT JENKINS CONCEPTS
+
+Jenkinsfile controls stages
+
+No Jenkinsfile → No visible stages
+
+Jenkins runs as jenkins user
+
+Jenkins does NOT need PR to run pipeline
+
+4️⃣ PYTEST (QUALITY GATE)
+🔑 WHY PYTEST IN DEVOPS
+
+CI should fail early if code is broken.
+
+📌 RUN PYTEST LOCALLY
+python3 -m pytest -v
+
+
+🔑 Preferred over pytest command.
+
+📌 HOW PYTEST WORKS
+
+Scans tests/ folder
+
+Looks for test_*.py
+
+Imports app code
+
+Uses Flask test client
+
+Does NOT start server
+
+🔑 INTERVIEW POINT
+
+Jenkins runs pytest before Docker build to prevent broken images.
+
+5️⃣ DOCKER (CONTAINERIZATION)
+🔑 DOCKER DEFINITIONS (INTERVIEW GOLD)
+
+Dockerfile → Image blueprint
+
+Docker Image → Immutable package
+
+Docker Container → Running instance
+
+📌 DOCKERFILE (MOST IMPORTANT FILE)
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["python", "app/main.py"]
+
+🔑 WHY THIS ORDER MATTERS
+
+Dependency caching
+
+Faster CI builds
+
+Smaller image size
+
+📌 DOCKER COMMANDS USED
+docker build -t school-app:1.0 .
+docker images
+docker run -d -p 5000:5000 --name school-app school-app:1.0
+docker exec -it school-app python3 -m pytest -v
+docker stop school-app
+docker rm school-app
+
+🔑 VERY IMPORTANT CONCEPT
+
+Containers are disposable, images are reusable.
+
+6️⃣ TOOL CONNECTION SUMMARY (INTERVIEW MUST)
+Tool	Connected To	How
+Linux	All tools	Base OS
+GitHub	Jenkins	Git plugin + credentials
+Jenkins	Docker	docker group permission
+Jenkins	Pytest	python3 -m pytest
+Docker	Jenkins	docker build
+Docker	GCP (next)	Artifact Registry
+⭐ MOST IMPORTANT THINGS TO REMEMBER (HIGHLIGHT)
+
+🔑 Jenkinsfile = CI logic
+🔑 Jenkins user must access Docker
+🔑 Pytest before Docker build
+🔑 Docker image is deployment unit
+🔑 GitHub is source of truth
+🔑 Linux permissions cause most CI issues
+
+🧠 HOW TO USE THIS DOCUMENT
+
+1️⃣ Read once fully
+2️⃣ Read again before interviews
+3️⃣ Use it to rebuild second project
+4️⃣ Add Terraform + Kubernetes later (we will)

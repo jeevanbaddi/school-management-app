@@ -1,0 +1,159 @@
+STEP-5: Docker Registry (GCP Artifact Registry) → Terraform → GKE (High-level first)
+
+Before writing any code, you must understand the flow.
+A senior DevOps engineer never jumps directly into Terraform.
+
+🔑 BIG PICTURE (MUST KNOW)
+
+Right now your flow is:
+
+GitHub
+  ↓
+Jenkins
+  ↓
+Pytest
+  ↓
+Docker image (local only)
+
+
+What’s missing?
+
+👉 Your Docker image is stuck inside Jenkins machine
+👉 Kubernetes (GKE) cannot pull it
+
+So we need:
+
+Jenkins
+  ↓
+Build Docker image
+  ↓
+Push image to Registry (GCP)
+  ↓
+Terraform creates infra
+  ↓
+GKE pulls image & runs app
+
+1️⃣ Why Do We Need a Docker Registry?
+🔑 MUST KNOW (Interview level)
+
+A Docker registry is a centralized place to store and version container images so that deployment platforms like Kubernetes can pull them.
+
+Without a registry:
+
+Jenkins builds image ❌
+
+GKE cannot access it ❌
+
+With a registry:
+
+Jenkins pushes image ✅
+
+GKE pulls image ✅
+
+Registry Options in GCP
+Option	Use
+Artifact Registry	✅ Recommended (modern)
+Container Registry (GCR)	Old (deprecated gradually)
+
+👉 We will use Artifact Registry.
+
+2️⃣ What Jenkins Will Do Differently (IMPORTANT)
+Current Jenkins stage:
+docker build -t school-app:ci .
+
+Updated Jenkins stages (conceptually):
+docker build
+docker tag
+docker push to Artifact Registry
+
+
+🔑 Jenkins is responsible for CI + image publishing
+🔑 Terraform is responsible for infrastructure only
+
+3️⃣ Terraform Role (CLEAR SEPARATION)
+
+This is a senior-level concept 👇
+
+🔑 MUST KNOW
+Tool	Responsibility
+Jenkins	Build & push artifacts
+Docker	Package application
+Terraform	Create infra (GKE, Registry)
+Kubernetes	Run containers
+
+🚫 Terraform should NOT:
+
+Build images
+
+Run tests
+
+Push code
+
+4️⃣ What Infrastructure We Will Create Using Terraform
+Minimal infra for this project:
+
+1️⃣ Artifact Registry (Docker repo)
+2️⃣ GKE cluster (1 small node)
+3️⃣ (Later) Cloud SQL (optional)
+
+All low-cost, covered by your GCP credits.
+
+5️⃣ Before Terraform – One Mandatory Check
+
+You must already have:
+
+gcloud auth list
+gcloud config list
+
+
+Expected:
+
+Your GCP account is active
+
+Correct project selected
+
+If needed:
+
+gcloud config set project <your-project-id>
+
+
+🔑 Terraform uses gcloud credentials under the hood
+
+6️⃣ What We Will Do NEXT (Step-by-Step Plan)
+
+We will NOT do everything at once.
+
+Step-5A (Next)
+
+✅ Create Artifact Registry (manual first)
+✅ Push Docker image from Jenkins to GCP
+
+Step-5B
+
+✅ Introduce Terraform
+✅ Convert manual infra → Terraform code
+
+Step-5C
+
+✅ Create GKE cluster via Terraform
+
+Step-5D
+
+✅ Deploy app to GKE
+
+7️⃣ Why We Do Manual First (VERY IMPORTANT)
+🔑 MUST KNOW (Senior mindset)
+
+“Never automate something you don’t understand manually.”
+
+So:
+
+First → create registry manually
+
+Understand permissions & auth
+
+Then → automate with Terraform
+
+This avoids:
+❌ Blind copy-paste Terraform
+❌ Debugging infra you don’t understand

@@ -1,0 +1,172 @@
+STEP-4A: Validate Jenkins Installation & Docker Access
+🔑 MUST KNOW (4+ Years DevOps Engineer)
+
+Before creating pipelines, you always validate:
+
+Jenkins service is running
+
+Jenkins user exists
+
+Jenkins can access Docker
+
+Jenkins can run shell commands
+
+1️⃣ Check Jenkins Service Status (VERY FIRST CHECK)
+
+Run:
+
+sudo systemctl status jenkins
+
+Expected (GOOD):
+● jenkins.service - Jenkins Continuous Integration Server
+   Active: active (running)
+
+If NOT running:
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+
+
+🔑 MUST KNOW
+
+Jenkins runs as a systemd service
+
+Should always start automatically after reboot
+
+2️⃣ Verify Jenkins Is Accessible (UI Check)
+
+Open browser:
+
+http://localhost:8080
+
+
+✔ Login page loads → Jenkins installed correctly
+
+3️⃣ Check Jenkins User (CRITICAL)
+
+Run:
+
+id jenkins
+
+
+Expected:
+
+uid=xxx(jenkins) gid=xxx(jenkins) groups=xxx(jenkins)
+
+
+🔑 MUST KNOW
+
+Jenkins runs as user jenkins
+
+Any permission issue is related to this user
+
+4️⃣ Check Docker Installation (System Level)
+
+Run:
+
+docker --version
+
+
+Expected:
+
+Docker version xx.xx.xx
+
+
+If Docker not found → Jenkins cannot use Docker.
+
+5️⃣ Check Docker Service Status
+sudo systemctl status docker
+
+
+Expected:
+
+Active: active (running)
+
+
+If not:
+
+sudo systemctl start docker
+sudo systemctl enable docker
+
+6️⃣ MOST IMPORTANT: Check Jenkins → Docker Access
+
+Run:
+
+sudo -u jenkins docker ps
+
+✅ If SUCCESS:
+CONTAINER ID   IMAGE   COMMAND   STATUS
+
+
+🎉 Jenkins already has Docker access
+👉 You can proceed to pipeline
+
+❌ If ERROR (Most Common):
+Got permission denied while trying to connect to the Docker daemon socket
+
+
+👉 This means Jenkins does NOT have Docker access
+We must fix it.
+
+🔧 FIX: Give Jenkins Docker Access (STANDARD SOLUTION)
+7️⃣ Add Jenkins to Docker Group
+sudo usermod -aG docker jenkins
+
+
+🔑 MUST KNOW
+
+Docker access is controlled via docker group
+
+Never run Jenkins as root
+
+8️⃣ Restart Services (MANDATORY)
+sudo systemctl restart docker
+sudo systemctl restart jenkins
+
+
+⚠️ Restart is required for group changes to take effect
+
+9️⃣ Re-Validate Docker Access
+
+Run again:
+
+sudo -u jenkins docker ps
+
+
+Expected:
+
+CONTAINER ID   IMAGE   COMMAND   STATUS
+
+
+✔ This confirms Jenkins can run Docker commands
+
+🔥 Interview Question (VERY COMMON)
+
+Q: Jenkins is failing at docker build. What do you check?
+
+Your Answer:
+
+“I check whether the Jenkins user is part of the docker group and verify Docker daemon access using sudo -u jenkins docker ps.”
+
+🔥 Strong, practical answer.
+
+10️⃣ Validate Jenkins Can Run Shell Commands
+
+In Jenkins UI:
+
+Dashboard → Manage Jenkins → Script Console
+
+
+Run:
+
+println "Jenkins is ready"
+
+
+✔ Output shown → Jenkins functioning properly
+
+11️⃣ FINAL VALIDATION CHECKLIST ✅
+Check	Status
+Jenkins service running	✅
+Jenkins UI accessible	✅
+Docker installed	✅
+Docker service running	✅
+Jenkins Docker access	✅

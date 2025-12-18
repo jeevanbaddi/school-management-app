@@ -1,0 +1,210 @@
+🚀 STEP-5B: Jenkins → Artifact Registry Integration
+🎯 Goal of this step
+
+After this step:
+
+Jenkins will build Docker image
+
+Jenkins will tag it correctly
+
+Jenkins will push it to GCP Artifact Registry
+
+No manual Docker push needed anymore
+
+This is true CI/CD.
+
+🔑 MUST-KNOW CONCEPT (READ THIS FIRST)
+
+Jenkins does NOT magically know GCP.
+Jenkins uses the same OS-level Docker + gcloud authentication that you already configured.
+
+Since:
+
+Jenkins runs on your Ubuntu
+
+Docker is authenticated with GCP (~/.docker/config.json)
+
+Jenkins user has Docker access
+
+👉 Jenkins can push images to Artifact Registry without extra plugins.
+
+1️⃣ Decide Image Naming Convention (IMPORTANT)
+
+We will standardize this (very important for interviews):
+
+REGION-docker.pkg.dev/PROJECT_ID/REPO/IMAGE:TAG
+
+Our values:
+
+REGION: us-central1
+
+PROJECT_ID: <your-project-id>
+
+REPO: school-app-repo
+
+IMAGE: school-app
+
+TAG: jenkins-${BUILD_NUMBER}
+
+🔑 Why BUILD_NUMBER?
+
+Every Jenkins build is uniquely versioned
+
+Easy rollback
+
+Industry standard
+
+2️⃣ Update Jenkinsfile (CORE STEP)
+
+📄 Update your Jenkinsfile (root of repo)
+
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_ID = "<YOUR_PROJECT_ID>"
+        REGION = "us-central1"
+        REPO = "school-app-repo"
+        IMAGE_NAME = "school-app"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/jeevanbaddi/school-management-app.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Pytest') {
+            steps {
+                sh 'python3 -m pytest -v'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh """
+                docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .
+                """
+            }
+        }
+
+        stage('Tag Docker Image') {
+            steps {
+                sh """
+                docker tag ${IMAGE_NAME}:${BUILD_NUMBER} \
+                ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${IMAGE_NAME}:${BUILD_NUMBER}
+                """
+            }
+        }
+
+        stage('Push Image to Artifact Registry') {
+            steps {
+                sh """
+                docker push \
+                ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${IMAGE_NAME}:${BUILD_NUMBER}
+                """
+            }
+        }
+    }
+}
+
+🔑 MUST-KNOW (VERY IMPORTANT – INTERVIEW)
+
+Jenkinsfile is pipeline as code
+
+Environment variables avoid hardcoding
+
+Image tagging strategy is critical in production
+
+Jenkins is only responsible for:
+
+Build
+
+Test
+
+Push
+
+❌ Jenkins should NOT create infra
+✅ Terraform will do that later
+
+3️⃣ Commit & Push Jenkinsfile Changes
+
+From your project directory:
+
+git status
+git add Jenkinsfile
+git commit -m "Integrate Jenkins with GCP Artifact Registry"
+git push
+
+4️⃣ Run Jenkins Pipeline Again
+
+Jenkins UI → your pipeline job
+
+Click Build Now
+
+Watch stages carefully
+
+You should see NEW stages:
+
+Build Docker Image
+
+Tag Docker Image
+
+Push Image to Artifact Registry
+
+5️⃣ Verify Image Pushed by Jenkins (VERY IMPORTANT)
+Option A: GCP Console
+Artifact Registry → school-app-repo → Images
+
+
+You should see:
+
+school-app
+  └── jenkins-1
+  └── jenkins-2
+
+
+(or build numbers)
+
+Option B: CLI
+gcloud artifacts docker tags list \
+us-central1-docker.pkg.dev/<PROJECT_ID>/school-app-repo/school-app
+
+🔥 Interview-Ready Explanation
+
+Q: How does Jenkins push Docker images to GCP?
+
+Your Answer:
+
+“Jenkins builds the Docker image, tags it using the Artifact Registry naming convention, and pushes it using Docker authentication configured via gcloud. Artifact Registry is used as the centralized image store for GKE.”
+
+🔥 This is a strong DevOps answer.
+
+⚠️ Common Issues (So You’re Prepared)
+Issue	Cause	Fix
+permission denied	Jenkins not in docker group	usermod -aG docker jenkins
+unauthorized push	Docker not authenticated	gcloud auth configure-docker
+wrong repo name	Typo in Jenkinsfile	Verify repo name
+✅ STEP-5B COMPLETE CHECKLIST
+
+✔ Jenkins builds Docker image
+✔ Jenkins tags image correctly
+✔ Jenkins pushes image to Artifact Registry
+✔ CI is cloud-integrated
+
+You now have real CI/CD, not just local builds 👏
+
+🔜 NEXT STEP (BIG ONE)
+
+👉 Step-6: Terraform – Create GKE cluster & deploy app
+
+This is where:
