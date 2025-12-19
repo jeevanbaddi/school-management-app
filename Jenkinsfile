@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PROJECT_ID = "<YOUR_PROJECT_ID>"
+        PROJECT_ID = "velvety-maker-480912-u3"
         REGION = "us-central1"
         REPO = "school-app-repo"
         IMAGE_NAME = "school-app"
