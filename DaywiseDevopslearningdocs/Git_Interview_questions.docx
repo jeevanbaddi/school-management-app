@@ -1,0 +1,255 @@
+🔥 ADVANCED & MOST-ASKED GIT + GITHUB INTERVIEW QUESTIONS
+
+(4–6 Years DevOps Engineer)
+
+I’ve grouped them so they’re easy to remember.
+
+🧠 SECTION-1: CORE GIT CONCEPTS (DEEP UNDERSTANDING)
+1️⃣ What happens internally when you run git commit?
+
+Answer (Strong):
+When git commit is executed:
+
+Git takes staged changes from the index
+
+Creates a snapshot (tree object)
+
+Generates a commit object containing:
+
+Author
+
+Timestamp
+
+Commit message
+
+Parent commit hash
+
+Updates HEAD to point to the new commit
+
+📌 Why interviewers ask:
+To check if you understand Git internals.
+
+2️⃣ What is the difference between working tree, staging area, and repository?
+
+Answer:
+
+Working tree → Files you edit
+
+Staging area → Files marked for commit (git add)
+
+Repository → Committed history
+
+Real-time:
+You selectively stage only required files before commit.
+
+3️⃣ How does Git detect file changes?
+
+Answer:
+Git uses content hashing (SHA-1/SHA-256), not timestamps.
+If content changes → hash changes → Git detects modification.
+
+4️⃣ What is HEAD in Git?
+
+Answer:
+HEAD is a pointer to the current commit or branch you are working on.
+
+Detached HEAD occurs when you checkout a commit instead of a branch.
+
+🌿 SECTION-2: BRANCHING & MERGING (CRITICAL)
+5️⃣ Difference between git merge, git rebase, and git cherry-pick?
+Command	Purpose	Use case
+merge	Combine branches	Team work
+rebase	Reapply commits	Clean history
+cherry-pick	Pick specific commit	Hotfix
+
+Interview Tip:
+
+“We avoid rebasing shared branches.”
+
+6️⃣ When would you prefer rebase over merge?
+
+Answer:
+
+Local feature branches
+
+Before creating PR
+
+To keep linear history
+
+Never on shared branches.
+
+7️⃣ What causes merge conflicts and how do you prevent them?
+
+Answer:
+Conflicts occur when same file + same line is modified differently.
+
+Prevention:
+
+Pull latest main
+
+Small commits
+
+Short-lived branches
+
+8️⃣ What is a fast-forward merge?
+
+Answer:
+When main has no new commits, Git just moves the pointer forward.
+
+git merge feature-branch
+
+
+No merge commit created.
+
+🧨 SECTION-3: RESET, REVERT & RECOVERY (PRODUCTION SAFETY)
+9️⃣ Difference between git reset --soft, --mixed, --hard?
+Mode	Effect
+soft	Keeps changes staged
+mixed	Keeps changes unstaged
+hard	Deletes everything
+
+📌 Rule:
+Never use --hard on shared branches.
+
+🔟 When should you use git revert?
+
+Answer:
+To rollback production code safely without rewriting history.
+
+Creates a new commit.
+
+1️⃣1️⃣ How do you recover a deleted commit?
+
+Answer:
+Using reflog:
+
+git reflog
+git checkout <commit-id>
+
+🔁 SECTION-4: COLLABORATION & GITHUB (REAL ENTERPRISE)
+1️⃣2️⃣ What are branch protection rules?
+
+Answer:
+Rules that restrict direct pushes and enforce:
+
+PRs
+
+Reviews
+
+CI checks
+
+1️⃣3️⃣ How do you enforce CI before merge?
+
+Answer:
+Using branch protection → “Require status checks to pass”.
+
+1️⃣4️⃣ How does GitHub webhook work?
+
+Answer:
+GitHub sends HTTP POST events to Jenkins on push/PR → pipeline triggers.
+
+1️⃣5️⃣ Difference between GitHub Actions and Jenkins?
+Jenkins	GitHub Actions
+External	Native
+Complex	Simple
+Highly customizable	GitHub-centric
+🏷️ SECTION-5: RELEASES, TAGS & DEPLOYMENTS
+1️⃣6️⃣ What are Git tags and how are they used?
+
+Answer:
+Tags mark release points.
+
+git tag v1.0
+git push origin v1.0
+
+
+Used for rollback and deployments.
+
+1️⃣7️⃣ How do you rollback to a previous release?
+
+Answer:
+
+Redeploy old tag
+
+Or revert commits after release
+
+1️⃣8️⃣ Difference between lightweight and annotated tags?
+
+Answer:
+Annotated tags store metadata (author, message).
+Preferred for production releases.
+
+🔐 SECTION-6: SECURITY & BEST PRACTICES
+1️⃣9️⃣ How do you prevent secrets from being committed?
+
+Answer:
+
+.gitignore
+
+Pre-commit hooks
+
+Secret scanners
+
+2️⃣0️⃣ What if a secret is already committed?
+
+Answer:
+
+Rotate secret
+
+Remove from history (BFG / filter-repo)
+
+⚙️ SECTION-7: REAL DEVOPS SCENARIOS
+2️⃣1️⃣ How does Git trigger Kubernetes deployment?
+
+Answer:
+Merge → CI → Build image → Push registry → Deploy to cluster
+
+2️⃣2️⃣ How do you handle hotfixes in production?
+
+Answer:
+
+Create hotfix branch from main
+
+Fix issue
+
+Merge back to main
+
+2️⃣3️⃣ How do you ensure clean commit history?
+
+Answer:
+
+Squash commits
+
+Rebase before PR
+
+Enforce PR rules
+
+2️⃣4️⃣ What is detached HEAD and how do you fix it?
+
+Answer:
+Occurs when checkout a commit.
+Fix by switching to a branch.
+
+2️⃣5️⃣ How do you sync forked repositories?
+
+Answer:
+
+git remote add upstream <repo>
+git fetch upstream
+git merge upstream/main
+
+🧠 FINAL INTERVIEW GOLDEN ANSWER (Memorize This)
+
+“We follow a PR-based Git workflow with protected main branch, automated CI via webhooks, and safe rollback using tags and revert. We avoid history rewriting on shared branches and ensure only validated code reaches production.”
+
+✅ If you know ALL of this → You are INTERVIEW READY
+
+Next we can:
+
+Do mock Git interview Q&A
+
+Practice rebase & cherry-pick hands-on
+
+Design Git strategy for a real project
+
+Just tell me 🔥
