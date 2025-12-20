@@ -5,8 +5,8 @@ def create_app():
     app.config["SECRET_KEY"] = "school-secret-key"
 
     @app.route("/")
-    def health():
-        return {"status": "ok"}, 200
+    def home():
+       return "<h1>School Management App is Running on GKE 🚀</h1>", 200
 
     @app.route("/login")
     def login():
