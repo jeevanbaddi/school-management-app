@@ -1,0 +1,280 @@
+1️⃣ FULL END-TO-END FLOW
+(From Terraform Apply → App Running on GKE → Errors → Fixes)
+This is the exact flow we followed (no missing steps).
+
+🔁 A. Infrastructure Creation (Terraform)
+Flow
+Terraform code
+ → terraform init
+ → terraform plan
+ → terraform apply
+ → GKE cluster + node pool created
+
+Commands
+cd terraform
+terraform init
+terraform plan -var="project_id=velvety-maker-480912-u3"
+terraform apply -var="project_id=velvety-maker-480912-u3"
+
+Errors we faced & fixes
+ErrorWhyFix403 GKE API disabledAPI not enabledgcloud services enable container.googleapis.comTerraform auth failedADC not configuredgcloud auth application-default login --no-launch-browsergcloud services enable failedgcloud CLI not logged ingcloud auth login --no-launch-browser
+
+🔁 B. kubectl Connection to GKE
+Flow
+GKE created
+ → kubectl configured
+ → Node visible
+
+Commands
+gcloud container clusters get-credentials school-gke-cluster \
+  --zone us-central1-a \
+  --project velvety-maker-480912-u3
+
+kubectl get nodes
+
+Error we faced
+gke-gcloud-auth-plugin not found
+
+Fix
+sudo apt install google-cloud-sdk-gke-gcloud-auth-plugin
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
+
+🔁 C. Application Deployment
+Flow
+Docker image (GAR)
+ → Kubernetes Deployment
+ → Pod running
+
+Deployment command
+kubectl apply -f k8s-deployment.yaml
+kubectl get pods
+
+Errors we faced
+ErrorMeaningFixImagePullBackOffWrong image tagCorrect tag + reapplyCrashLoopBackOffApp errorCheck logs
+Commands used:
+kubectl describe pod <pod>
+kubectl logs <pod>
+
+
+🔁 D. Exposing Application
+Flow
+Pod
+ → Service (LoadBalancer)
+ → External IP
+ → Browser
+
+Commands
+kubectl apply -f k8s-service.yaml
+kubectl get svc
+
+Errors we faced
+ErrorWhyFixService not foundYAML not appliedkubectl applyEXTERNAL-IP pendingLB provisioningWait
+
+🔁 E. Rolling Update & Redeploy
+Flow
+Code change
+ → Jenkins builds new image
+ → Deployment updated
+ → kubectl apply
+ → Rolling update
+
+Commands
+kubectl rollout status deployment school-app
+kubectl rollout history deployment school-app
+kubectl rollout undo deployment school-app
+
+
+🔁 F. Cleanup
+Flow
+Disable deletion protection
+ → terraform destroy
+
+Commands
+terraform apply   # deletion_protection = false
+terraform destroy
+
+
+2️⃣ LINUX – 25 MOST IMPORTANT COMMANDS
+(4+ Years DevOps – REAL USE)
+🔹 System & Resource Monitoring
+top
+htop
+uptime
+free -h
+vmstat
+iostat
+mpstat
+
+🔹 Disk & Filesystem
+df -h
+du -sh *
+lsblk
+mount
+umount
+
+🔹 Processes
+ps aux
+ps -ef
+kill -9 <pid>
+nice
+renice
+
+🔹 Logs & Services
+journalctl
+journalctl -u docker
+journalctl -u kubelet
+systemctl status docker
+systemctl restart docker
+
+🔹 Permissions (VERY IMPORTANT)
+chmod 755 file
+chmod -R 644 folder
+chown user:group file
+id
+whoami
+
+👉 Interview focus: CPU spike, disk full, permission denied, process hung.
+
+3️⃣ KUBERNETES – 30 COMMANDS (PRODUCTION GRADE)
+🔹 Basic Visibility
+kubectl get pods
+kubectl get svc
+kubectl get deploy
+kubectl get nodes
+kubectl get all
+
+🔹 Deep Inspection (MOST IMPORTANT)
+kubectl describe pod <pod>
+kubectl describe deployment <deploy>
+kubectl describe svc <svc>
+
+🔹 Logs (DAY-TO-DAY WORK)
+kubectl logs <pod>
+kubectl logs -f <pod>
+kubectl logs <pod> --previous
+
+🔹 Exec into Pod
+kubectl exec -it <pod> -- /bin/sh
+
+🔹 Resource Usage
+kubectl top pods
+kubectl top nodes
+
+🔹 Rollout & Recovery
+kubectl rollout status deployment <name>
+kubectl rollout history deployment <name>
+kubectl rollout undo deployment <name>
+
+🔹 Scaling & Healing
+kubectl scale deployment school-app --replicas=3
+kubectl delete pod <pod>
+
+👉 Kubernetes self-healing is core interview topic.
+
+4️⃣ PRODUCTION FAILURE SCENARIOS (YOU MUST PRACTICE)
+🔥 Scenario 1: App crash
+kubectl logs pod
+kubectl describe pod
+
+🔥 Scenario 2: Image pull failure
+kubectl describe pod
+
+🔥 Scenario 3: No traffic
+kubectl describe svc
+kubectl get endpoints
+
+🔥 Scenario 4: High CPU
+kubectl top pods
+kubectl top nodes
+
+🔥 Scenario 5: Bad release
+kubectl rollout undo deployment school-app
+
+
+5️⃣ DOCKER – 25 COMMANDS (CI + PROD)
+🔹 Images & Containers
+docker images
+docker ps
+docker ps -a
+docker inspect <container>
+
+🔹 Logs & Exec
+docker logs <container>
+docker exec -it <container> sh
+
+🔹 Build & Cleanup
+docker build -t app .
+docker tag
+docker push
+docker rmi
+docker system prune
+
+🔹 Networking
+docker port <container>
+docker network ls
+docker network inspect
+
+
+6️⃣ BEST PLAN FOR TODAY (HONEST RECOMMENDATION)
+❌ NOT recommended
+Trying Linux + Docker + Kubernetes + Git all today
+
+✅ RECOMMENDED 3-DAY OPERATION PLAN
+🟢 TODAY – Kubernetes Operations (BEST ROI)
+
+
+Logs
+
+
+Failures
+
+
+Rollbacks
+
+
+Scaling
+
+
+Zero-downtime deploy
+
+
+🟡 DAY 2 – Linux + Docker
+
+
+CPU/memory/disk
+
+
+Logs
+
+
+Permissions
+
+
+Container internals
+
+
+🔵 DAY 3 – Git + CI/CD
+
+
+Branching
+
+
+Conflicts
+
+
+Rollbacks
+
+
+Bad commits
+
+
+
+🎯 NEXT ACTION (START NOW)
+Since infra is destroyed:
+👉 Step 1: Re-create GKE using Terraform
+👉 Step 2: Deploy app again
+👉 Step 3: Start Kubernetes failure scenarios (guided)
+Reply with one line:
+“Recreate GKE cluster and start Kubernetes production practice”
+And today we will work like real on-call DevOps engineers 💪

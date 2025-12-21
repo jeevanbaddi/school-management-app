@@ -1,0 +1,202 @@
+✅ STEP-7: Kubernetes Deployment (After GKE Creation)
+🔁 FLOW (LOCK THIS)
+GKE cluster
+ → kubectl configured
+ → Deployment created
+ → Service exposed
+ → App accessible
+
+
+1️⃣ Connect kubectl to GKE (MANDATORY)
+Run this exactly:
+gcloud container clusters get-credentials school-gke-cluster \
+  --zone us-central1-a \
+  --project velvety-maker-480912-u3
+
+Verify:
+kubectl get nodes
+
+Expected:
+STATUS: Ready
+
+🔑 If nodes are Ready → cluster is usable
+
+2️⃣ Create Kubernetes Deployment (App)
+We will deploy the image that Jenkins pushed to Artifact Registry.
+📄 k8s-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: school-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: school-app
+  template:
+    metadata:
+      labels:
+        app: school-app
+    spec:
+      containers:
+      - name: school-app
+        image: us-central1-docker.pkg.dev/velvety-maker-480912-u3/school-app-repo/school-app:jenkins-<LATEST_BUILD_NUMBER>
+        ports:
+        - containerPort: 5000
+
+👉 Replace <LATEST_BUILD_NUMBER> with the latest Jenkins build tag.
+Apply:
+kubectl apply -f k8s-deployment.yaml
+
+Verify:
+kubectl get pods
+
+Expected: Pod status = Running
+
+3️⃣ Expose Application (Service)
+📄 k8s-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: school-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: school-app
+  ports:
+  - port: 80
+    targetPort: 5000
+
+Apply:
+kubectl apply -f k8s-service.yaml
+
+
+4️⃣ Get Public IP (THIS IS THE RESULT)
+kubectl get svc school-app-service
+
+Wait 1–2 minutes.
+You will see:
+EXTERNAL-IP: <PUBLIC_IP>
+
+Open in browser:
+http://<PUBLIC_IP>
+
+1️⃣ Run the correct command to see the Service
+kubectl get svc school-app-service
+
+
+You should see something like:
+
+NAME                 TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)
+school-app-service   LoadBalancer   10.xx.xx.xx    35.238.96.21     80:xxxxx/TCP
+
+
+👉 35.238.96.21 is your public IP
+
+2️⃣ Open the application in browser 🌍
+
+Open your browser and go to:
+
+http://35.238.96.21
+
+
+🎉 You should now see your School Management web application running on GKE.
+
+🧠 MUST-KNOW (INTERVIEW LEVEL)
+
+Kubernetes commands (kubectl) produce output.
+You never re-run output lines as shell commands.
+
+🔍 If the page does NOT load (quick checks)
+Check pods
+kubectl get pods
+
+
+Must be Running.
+
+Check logs
+kubectl logs <pod-name>
+
+Check service details
+kubectl describe svc school-app-service
+
+
+Ensure:
+
+TargetPort: 5000
+
+Endpoints exist
+
+📝 Notes (30 mins max – ONLY THIS)
+📌 Concept: Accessing GKE LoadBalancer
+
+Flow
+
+kubectl get svc → External IP → Browser
+
+
+Commands
+
+kubectl get svc
+kubectl describe svc
+kubectl logs pod
+
+
+Common Errors
+
+Running output as command
+
+EXTERNAL-IP pending
+
+Port mismatch
+
+Interview Explanation
+
+LoadBalancer services expose applications via a public IP in GKE.
+
+🎉 Your application is LIVE on GKE
+
+🧠 Common Errors (YOU SHOULD KNOW)
+ErrorWhyImagePullBackOffWrong image tag / repoPending serviceLoad balancer still provisioningCrashLoopBackOffApp error / wrong port
+
+🎤 Interview-Style Explanation
+
+How do you deploy an app to GKE?
+Answer:
+After creating the GKE cluster using Terraform, I configure kubectl, deploy the application using a Kubernetes Deployment, expose it using a LoadBalancer Service, and access the application via the external IP.
+
+
+📝 NOTES (30 mins MAX – ONLY THIS)
+📌 Concept: GKE Application Deployment
+Flow
+kubectl → Deployment → Service → Public IP
+
+Commands
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl get pods
+kubectl get svc
+
+Common Errors
+
+
+ImagePullBackOff → Wrong image/tag
+
+
+Pending LB → Wait for IP
+
+
+Port mismatch → containerPort vs targetPort
+
+
+Interview Explanation
+
+Kubernetes runs containers via Deployments and exposes them using Services.
+
+❌ STOP NOTES HERE
+
+🚦CONFIRMATION REQUIRED (ONE LINE)
+After you access the app in browser, reply:
+👉 “Application successfully deployed and accessible on GKE”
+Then we will IMMEDIATELY do CLEANUP (terraform destroy)
+and after that we will practice Terraform code & start second repo 💪

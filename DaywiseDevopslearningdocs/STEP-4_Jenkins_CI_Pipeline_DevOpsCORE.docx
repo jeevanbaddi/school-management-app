@@ -281,3 +281,17 @@ That’s how confidence comes.
 2️⃣ Configure Docker access
 3️⃣ Create pipeline job
 4️⃣ Run build
+
+to  build image directly after running jenkins pipeline
+How this looks technically
+Jenkinsfile (conceptual)
+stage('Update K8s Manifest') {
+  steps {
+    sh """
+    sed -i 's|image:.*|image: ${IMAGE_FULL_NAME}:${BUILD_NUMBER}|' k8s-deployment.yaml
+    git add k8s-deployment.yaml
+    git commit -m "Deploy image jenkins-${BUILD_NUMBER}"
+    git push origin main
+    """
+  }
+}
