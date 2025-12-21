@@ -1,0 +1,154 @@
+NEXT STEP: Terraform Apply → Create GKE Cluster
+
+We’ll do this safely, intentionally, and with practice mindset.
+
+⚠️ BEFORE APPLY (VERY IMPORTANT – READ ONCE)
+
+terraform apply will CREATE real cloud resources
+
+GKE costs money while running
+
+We will:
+
+Create
+
+Verify
+
+Use briefly
+
+Destroy
+
+👉 This is exactly how real engineers work in non-prod.
+
+🔁 FLOW (LOCK THIS IN YOUR HEAD)
+terraform apply
+   ↓
+GKE cluster created
+   ↓
+kubectl configured
+   ↓
+Cluster verified
+   ↓
+(terraform destroy later)
+
+🧪 STEP 6A: Apply Terraform (CREATE CLUSTER)
+
+From inside terraform/ directory:
+
+terraform apply -var="project_id=YOUR_PROJECT_ID"
+
+
+When prompted:
+
+Do you want to perform these actions?
+
+
+Type:
+
+yes
+
+
+⏳ This may take 5–10 minutes.
+
+✅ What success looks like
+
+At the end you should see:
+
+Apply complete! Resources: X added, 0 changed, 0 destroyed.
+
+
+And Terraform outputs:
+
+cluster_name = school-gke-cluster
+
+🧠 WHY THIS WORKED (MENTAL MODEL)
+
+Terraform used gcloud authentication
+
+Provider talked to GCP APIs
+
+State file recorded:
+
+Cluster
+
+Node pool
+
+👉 Terraform now “owns” this infrastructure.
+
+🧪 STEP 6B: Connect kubectl to GKE (MANDATORY)
+
+Now we must tell kubectl which cluster to talk to.
+
+Run:
+
+gcloud container clusters get-credentials school-gke-cluster \
+  --zone us-central1-a \
+  --project YOUR_PROJECT_ID
+
+Verify connection
+kubectl get nodes
+
+Expected:
+NAME             STATUS   ROLES    AGE   VERSION
+gke-xxxx-node    Ready    <none>   Xm    v1.xx
+
+
+✅ This confirms:
+
+Cluster exists
+
+Node is ready
+
+You can deploy workloads
+
+🧠 MUST-KNOW (INTERVIEW LEVEL)
+
+Terraform creates infrastructure,
+but kubectl talks directly to Kubernetes.
+
+Terraform ❌ does not deploy apps
+kubectl ✅ deploys apps
+
+📝 NOTES YOU SHOULD TAKE (30 MIN MAX)
+
+Use ONLY this format 👇
+
+📌 Concept: Terraform → GKE Cluster
+Flow
+Terraform apply → GKE cluster → kubectl access
+
+Commands
+terraform init
+terraform plan
+terraform apply
+gcloud container clusters get-credentials
+kubectl get nodes
+
+Common Errors
+
+Permission denied → Missing GKE IAM role
+
+API disabled → container.googleapis.com
+
+kubectl not configured → get-credentials not run
+
+Interview-Style Explanation
+
+Terraform is used to provision a GKE cluster as code, and kubectl is configured to interact with the cluster for workload deployment.
+
+❌ STOP NOTES HERE
+
+🎯 PRACTICE TASK (DO NOT SKIP)
+Task 1
+
+Run terraform apply
+
+Wait for completion
+
+Task 2
+
+Run kubectl get nodes
+
+Ensure node is Ready
+
+🚦
