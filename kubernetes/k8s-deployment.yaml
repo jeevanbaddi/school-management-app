@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: school-app
-        image: us-central1-docker.pkg.dev/velvety-maker-480912-u3/school-app-repo/school-app:9
+        image: us-central1-docker.pkg.dev/velvety-maker-480912-u3/school-app-repo/school-app:11
         ports:
         - containerPort: 5000
