@@ -1,0 +1,284 @@
+I’ll go slow, structured, and practical, exactly like a mentor in a real company.
+
+🚀 STEP-6: Terraform Basics → GKE Cluster Creation
+
+Before writing any code, you must understand WHAT Terraform is, WHY we use it, and HOW it fits into our flow.
+
+1️⃣ Where Terraform Fits in OUR Flow (MOST IMPORTANT)
+Till now we have:
+GitHub
+  ↓
+Jenkins (CI)
+  ↓
+Docker Image
+  ↓
+Artifact Registry
+
+What is missing?
+
+👉 Infrastructure to RUN the image
+
+So now:
+
+Artifact Registry (image)
+   ↓
+Terraform (creates infra)
+   ↓
+GKE (Kubernetes cluster)
+   ↓
+Application running
+
+
+🔑 Interview line
+
+“Jenkins builds artifacts, Terraform provisions infrastructure, Kubernetes runs workloads.”
+
+2️⃣ What is Terraform? (Interview-Ready Definition)
+
+Terraform is an Infrastructure as Code tool used to create, update, and delete cloud resources in a repeatable and automated way using declarative configuration files.
+
+In simple words:
+
+Terraform = Blueprint for infrastructure
+
+Instead of clicking in console
+
+We write .tf files
+
+Terraform does exactly what we describe
+
+3️⃣ Why DevOps Engineers MUST Use Terraform
+Without Terraform:
+
+❌ Manual clicks
+❌ No consistency
+❌ Hard to recreate infra
+❌ Not auditable
+
+With Terraform:
+
+✅ Version-controlled infra
+✅ Repeatable
+✅ Easy cleanup (important for cost!)
+✅ Interview-mandatory skill
+
+4️⃣ Terraform Core Concepts (MUST KNOW)
+
+I’ll explain only what we need now, not everything.
+
+🔹 Provider
+
+Tells Terraform which cloud to talk to.
+
+Example:
+
+provider "google" {
+  project = "your-project-id"
+  region  = "us-central1"
+}
+
+
+🔑 Meaning:
+
+“Terraform, talk to Google Cloud”
+
+Uses your gcloud auth
+
+🔹 Resource
+
+Actual cloud object.
+
+Example:
+
+resource "google_container_cluster" "gke_cluster" {
+  name     = "school-gke-cluster"
+  location = "us-central1-a"
+}
+
+
+🔑 Meaning:
+
+“Create a GKE cluster”
+
+🔹 State
+
+Terraform keeps a state file:
+
+terraform.tfstate
+
+
+🔑 This tracks:
+
+What Terraform created
+
+What already exists
+
+What to change or delete
+
+⚠️ Never delete state file blindly
+
+5️⃣ Our Terraform Scope (VERY IMPORTANT)
+
+We will keep it MINIMAL to control cost.
+
+We will create:
+
+✅ GKE cluster (1 node only)
+
+We will NOT create (now):
+
+❌ Cloud SQL
+❌ Load balancer separately
+❌ Complex networking
+
+This keeps:
+
+Learning simple
+
+Cost minimal
+
+Cleanup easy
+
+6️⃣ Folder Structure for Terraform (STANDARD)
+
+Inside your repo, create:
+
+terraform/
+ ├── main.tf
+ ├── variables.tf
+ └── outputs.tf
+
+
+🔑 Interview note
+
+Keeping Terraform code separate from app code is best practice.
+
+7️⃣ Terraform Installation (Check First)
+
+Run:
+
+terraform version
+
+
+If not installed:
+
+sudo apt update
+sudo apt install -y terraform
+
+
+Verify again:
+
+terraform version
+
+8️⃣ Terraform – GKE Cluster Code (MINIMAL & SAFE)
+📄 terraform/main.tf
+provider "google" {
+  project = var.project_id
+  region  = var.region
+}
+
+resource "google_container_cluster" "primary" {
+  name     = "school-gke-cluster"
+  location = "us-central1-a"
+
+  remove_default_node_pool = true
+  initial_node_count       = 1
+}
+
+resource "google_container_node_pool" "primary_nodes" {
+  name       = "primary-node-pool"
+  location   = "us-central1-a"
+  cluster    = google_container_cluster.primary.name
+  node_count = 1
+
+  node_config {
+    machine_type = "e2-medium"
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+  }
+}
+
+📄 terraform/variables.tf
+variable "project_id" {
+  description = "GCP Project ID"
+}
+
+variable "region" {
+  description = "GCP Region"
+  default     = "us-central1"
+}
+
+📄 terraform/outputs.tf
+output "cluster_name" {
+  value = google_container_cluster.primary.name
+}
+
+9️⃣ Terraform Commands (DAY-TO-DAY – MUST KNOW)
+
+From terraform/ directory:
+
+Initialize
+terraform init
+
+
+👉 Downloads provider plugins
+
+Plan
+terraform plan -var="project_id=YOUR_PROJECT_ID"
+
+
+👉 Shows what will be created
+
+Apply
+terraform apply -var="project_id=YOUR_PROJECT_ID"
+
+
+👉 Creates GKE cluster
+Type yes when prompted
+
+🔑 Interview Tip
+
+Never run terraform apply without seeing terraform plan.
+
+10️⃣ Cost Safety (IMPORTANT)
+
+⚠️ GKE cluster costs money while running
+
+So we will:
+
+Test deployment
+
+Then DELETE cluster
+
+Cleanup command:
+
+terraform destroy -var="project_id=YOUR_PROJECT_ID"
+
+11️⃣ What Comes AFTER Cluster Creation
+
+Once GKE is ready:
+1️⃣ Connect kubectl to cluster
+2️⃣ Create Kubernetes Deployment
+3️⃣ Create Service (LoadBalancer)
+4️⃣ Access app via browser
+
+That will be Step-7.
+
+12️⃣ What You Should Do NOW (Action Items)
+
+1️⃣ Install Terraform
+2️⃣ Create terraform/ folder & files
+3️⃣ Run:
+
+terraform init
+terraform plan
+
+
+❌ Do NOT apply yet until you confirm plan output
+
+🚦Reply with ONE line after plan succeeds:
+
+“Terraform plan completed successfully, ready to apply”
+
+We will then create the GKE cluster together and continue 🚀
