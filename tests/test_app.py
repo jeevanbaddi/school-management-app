@@ -6,4 +6,4 @@ def test_health_endpoint():
 
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json["status"] == "ok"
+    assert b"School Management App is Running on GKE" in response.data
