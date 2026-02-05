@@ -1,0 +1,137 @@
+Why this step is mandatory ? why not ?
+
+Jenkins pulls code from GitHub
+
+Docker builds image from repo
+
+Terraform & Kubernetes refer to repo artifacts
+
+Interviews expect clean repo structure
+
+📁 Final Repo Structure (We will create this FIRST)
+school-management-app/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── models.py
+│   ├── routes.py
+│   └── templates/
+│       ├── login.html
+│       ├── admin_dashboard.html
+│       └── faculty_dashboard.html
+├── tests/
+│   ├── __init__.py
+│   ├── test_app.py
+│   └── test_routes.py
+├── requirements.txt
+├── Dockerfile
+├── Jenkinsfile
+├── .gitignore
+└── README.md
+
+
+This structure is production-standard.
+
+🔹 Step-2: Do we need git commands?
+✔️ YES – but only basic, real-time commands
+
+These are exact commands used in companies.
+
+🔹 Step-3: Create GitHub Repo (UI – No CLI yet)
+
+Go to GitHub
+
+Click New Repository
+
+Repo name:
+
+school-management-app
+
+
+Visibility: Public
+
+❌ Don’t add README
+
+❌ Don’t add .gitignore
+
+Click Create
+
+🔹 Step-4: Create Project Structure Locally (Git + Linux Commands)
+Navigate to workspace
+cd ~
+mkdir school-management-app
+cd school-management-app
+
+Initialize git repo
+git init
+
+Create folders
+mkdir app tests
+mkdir app/templates
+
+Create files
+touch app/__init__.py
+touch app/main.py
+touch app/models.py
+touch app/routes.py
+
+touch tests/__init__.py
+touch tests/test_app.py
+touch tests/test_routes.py
+
+touch requirements.txt
+touch Dockerfile
+touch Jenkinsfile
+touch .gitignore
+touch README.md
+
+🔹 Step-5: Verify Structure
+tree
+
+
+Expected:
+
+school-management-app
+├── app
+│   ├── __init__.py
+│   ├── main.py
+│   ├── models.py
+│   ├── routes.py
+│   └── templates
+├── tests
+│   ├── __init__.py
+│   ├── test_app.py
+│   └── test_routes.py
+├── Dockerfile
+├── Jenkinsfile
+├── README.md
+├── requirements.txt
+└── .gitignore
+
+🔹 Step-6: First Git Commit (IMPORTANT)
+git status
+git add .
+git commit -m "Initial project structure for school management app"
+
+🔹 Step-7: Connect to GitHub Remote
+git branch -M main
+git remote add origin https://github.com/<your-username>/school-management-app.git
+git push -u origin main
+
+
+✅ Now GitHub has clean empty structure
+✅ This is how real teams start projects
+
+🎯 What We Do NEXT (Only ONE Step)
+
+👉 Next Step = Add Flask app code + pytest code
+
+I will:
+
+Write main.py
+
+Add pytest tests
+
+Update requirements.txt
+
+Explain every file

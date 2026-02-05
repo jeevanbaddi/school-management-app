@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: school-app
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: school-app
@@ -15,5 +15,40 @@ spec:
       containers:
       - name: school-app
         image: us-central1-docker.pkg.dev/velvety-maker-480912-u3/school-app-repo/school-app:11
+
+        # 🔹 Container port
         ports:
         - containerPort: 5000
+
+        # 🔹 Environment variable from ConfigMap
+        env:
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: school-app-config
+              key: APP_ENV
+
+        # 🔹 Resource management
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+
+        # 🔹 Readiness probe (controls traffic)
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+        # 🔹 Liveness probe (restarts app if stuck)
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20

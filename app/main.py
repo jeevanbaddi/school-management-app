@@ -6,7 +6,12 @@ def create_app():
 
     @app.route("/")
     def home():
-       return "<h1>School Management App is Running on GKE 🚀</h1>", 200
+        return {
+            "status": "ok",
+            "version": "v2",
+            "message": "School Management App is Running on GKE 🚀"
+    }, 200
+
 
     @app.route("/login")
     def login():

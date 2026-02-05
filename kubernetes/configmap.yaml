@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: school-app-config
+data:
+  APP_ENV: "bld"
+  LOG_LEVEL: "info"

@@ -1,0 +1,280 @@
+1️⃣ What is a Dockerfile? (Definition – Interview Ready)
+🔑 Definition
+
+A Dockerfile is a text file that contains a set of instructions used by Docker to build a container image in a layered, reproducible way.
+
+🔑 In simple words
+
+Dockerfile = Recipe
+
+Docker image = Prepared dish
+
+Docker container = Dish being served & eaten
+
+🔑 MUST KNOW (4+ Years)
+
+Dockerfile is not executed line-by-line at runtime
+
+It is used only during image build
+
+Each instruction creates a read-only layer
+
+Layers are cached & reused
+
+2️⃣ How Dockerfile Works Internally (IMPORTANT)
+
+When you run:
+
+docker build -t school-app .
+
+
+Docker does:
+
+Reads Dockerfile top to bottom
+
+Executes each instruction
+
+Creates an image layer
+
+Caches that layer
+
+Final image = stack of layers
+
+👉 This is why instruction order matters.
+
+3️⃣ General Dockerfile Syntax (Standard Format)
+
+Most production Dockerfiles follow this pattern:
+
+FROM <base-image>
+
+WORKDIR <directory>
+
+COPY <dependency-files>
+RUN <install dependencies>
+
+COPY <application-code>
+
+EXPOSE <port>
+
+CMD / ENTRYPOINT
+
+🔑 MUST KNOW
+
+FROM → mandatory
+
+CMD or ENTRYPOINT → mandatory
+
+Order affects:
+
+Build speed
+
+Image size
+
+CI performance
+
+4️⃣ Now YOUR Dockerfile – Line by Line (DEEP EXPLANATION)
+🔹 FROM python:3.10-slim
+What it means
+
+Uses official Python Docker image
+
+Python version = 3.10
+
+OS = Debian slim
+
+🔑 Why Python 3.10?
+
+Stable
+
+Long-term support
+
+Compatible with Flask & pytest
+
+Widely used in production
+
+🔑 Why NOT latest?
+
+❌ latest can break builds
+✔ Fixed version ensures reproducibility
+
+🔑 Why -slim?
+
+Smaller image size
+
+Faster pull
+
+Reduced attack surface
+
+Image	Size
+python:3.10	~900 MB
+python:3.10-slim	~120 MB
+
+👉 Senior engineers always prefer slim
+
+🔹 WORKDIR /app
+What it does
+
+Creates /app inside container
+
+Sets it as default directory
+
+All future commands run from /app
+
+Equivalent to:
+cd /app
+
+🔑 Why is this important?
+
+Avoids absolute paths
+
+Cleaner Dockerfile
+
+Prevents permission issues
+
+⚠️ COMMON MISTAKE
+
+❌ Not setting WORKDIR
+✔ Leads to messy paths like /app/app/main.py
+
+🔹 COPY requirements.txt .
+What it does
+
+Copies requirements.txt from host → container /app
+
+🔑 WHY copy this FIRST? (VERY IMPORTANT)
+
+This is called Docker Layer Caching Optimization.
+
+Scenario:
+
+You change app code
+
+Dependencies stay same
+
+Docker will:
+✔ Reuse cached dependency layer
+✔ Skip reinstalling packages
+✔ Build faster
+
+⚠️ COMMON MISTAKE
+
+❌ Copy entire code first
+❌ Then install dependencies
+✔ This causes slow builds
+
+🔹 RUN pip install --no-cache-dir -r requirements.txt
+What it does
+
+Installs Python dependencies inside image
+
+🔑 Why --no-cache-dir?
+
+Prevents pip cache storage
+
+Reduces image size
+
+Cleaner image
+
+🔑 MUST KNOW
+
+RUN executes during image build
+
+Creates a permanent image layer
+
+🔹 COPY . .
+What it does
+
+Copies entire project into /app
+
+🔑 Why AFTER dependencies?
+
+App code changes frequently
+
+Dependencies don’t
+
+This improves:
+✔ Build speed
+✔ CI efficiency
+
+🔹 EXPOSE 5000
+What it does
+
+Documents that container listens on port 5000
+
+Helps Docker & Kubernetes networking
+
+🔑 MUST KNOW
+
+EXPOSE does NOT publish port
+
+-p in docker run publishes it
+
+Interview Trap ❗
+
+EXPOSE alone does NOT make app accessible
+
+Correct answer:
+
+Port mapping is done via docker run -p or Kubernetes Service.
+
+🔹 CMD ["python", "app/main.py"]
+What it does
+
+Defines default command when container starts
+
+🔑 CMD vs RUN (IMPORTANT)
+RUN	CMD
+Executes at build time	Executes at runtime
+Creates image layer	Starts container
+Cannot be overridden easily	Can be overridden
+🔑 Why JSON array syntax?
+
+Avoids shell issues
+
+Better signal handling
+
+Recommended by Docker
+
+🔑 ENTRYPOINT vs CMD (GOOD TO KNOW)
+
+CMD → default command
+
+ENTRYPOINT → fixed command
+
+We use CMD because:
+✔ Simpler
+✔ Flexible
+
+5️⃣ How This Dockerfile Is Used in CI/CD
+GitHub
+  ↓
+Jenkins
+  ↓
+docker build
+  ↓
+Docker image
+  ↓
+Artifact Registry
+  ↓
+GKE
+
+
+👉 Same Dockerfile used everywhere
+
+6️⃣ Real Interview Question & Answer
+❓ Why is Dockerfile layered?
+
+Answer:
+
+“Docker images are built in layers to enable caching and faster rebuilds. Only layers affected by changes are rebuilt.”
+
+7️⃣ Summary (What You MUST Remember)
+
+🔑 Dockerfile = image blueprint
+🔑 Order matters
+🔑 Base image version must be fixed
+🔑 Layer caching improves CI speed
+🔑 Same image used in dev, CI & prod
+
+
